@@ -18,7 +18,7 @@ will be written to `"config.jl"`.
 - dfield: calibrated FOV for the objective being used
 - hbottom: distance from the bottom of the post to the bottom of the beams
 - htop: distance from the bottom of the beams to the top of the bumpers
-- chamfertop: angle at which the tops of the posts and beams should be chamfered
+- chamfertop: angle at which the top of the bumper should be chamfered
 - cutangle: angles at which blocks should be cut to avoid shadowing
 - overlap: amount that neighboring blocks should overlap to ensure they are connected
 - nhammock: number of hammock slices to write
