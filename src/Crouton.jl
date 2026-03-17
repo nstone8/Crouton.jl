@@ -1062,7 +1062,8 @@ function scaffold(scaffolddir,kwargs::Dict)
         #build the bumper
         #we will make two outlines, one stubbier than the other
         @assert (kwargs[:h1] - 2*kwargs[:cornerdiff]) > 0 "cornerdiff is too large"
-        ov1 = outlineverts(kwargs[:w] + 2*kwargs[:cornerdiff],kwargs[:h1] - 2*kwargs[:cornerdiff],kwargs[:h2],kwargs[:h3])
+        ov1 = outlineverts(kwargs[:w] + 2*kwargs[:cornerdiff],
+                           kwargs[:h1] - 2*kwargs[:cornerdiff],kwargs[:h2],kwargs[:h3])
         ov2 = outlineverts(kwargs[:w],kwargs[:h1],kwargs[:h2],kwargs[:h3])
         #this will give us asymmetry so we can easily verify orientation
         ov = vcat(ov1[1:2],ov2[3:8])
@@ -1074,11 +1075,14 @@ function scaffold(scaffolddir,kwargs::Dict)
                          kwargs[:hbottom]+kwargs[:htop],kwargs[:dslice],kwargs[:overlap],
                          kwargs[:cutangle])
         @info "hatching bumper"
-        bh = hatch(b,kwargs[:dhatch],kwargs[:hatchdir],pi/2)
+        bh = hatch(b,dhatch=kwargs[:dhatch],bottomdir=kwargs[:hatchdir],diroffset=pi/2,
+                   retryoffset=0.1)
         @info "compiling bumper"
-        compbumper = CompiledGeometry(joinpath("scripts","bumper.gwl"),bh;laserpower=kwargs[:laserpower],scanspeed=kwargs[:scanspeed])
+        compbumper = CompiledGeometry(joinpath("scripts","bumper.gwl"),bh;
+                                      laserpower=kwargs[:laserpower],scanspeed=kwargs[:scanspeed])
         #get the coordinates of all the posts and beams
-        pc = postbeamcoords(kwargs[:w],kwargs[:h1],kwargs[:h2],kwargs[:h3],kwargs[:cornerdiff],kwargs[:hexsize])
+        pc = postbeamcoords(kwargs[:w],kwargs[:h1],
+                            kwargs[:h2],kwargs[:h3],kwargs[:cornerdiff],kwargs[:hexsize])
 
         #remove hammocks which don't have 6 vertices (i.e. that are incomplete)
         filter!(pc.hexcoords) do h
