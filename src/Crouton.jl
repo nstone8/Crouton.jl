@@ -514,7 +514,7 @@ function post(;kwargs...)
                                    #the amount of 'overcut'
                                    #have to divide by tan(30) to account for how moving the edge
                                    #of the triangle towards its center changes the side length
-                                   2*(z-kwargs[:hbottom])*tan(kwargs[:chamfertop])/tand(30)
+                                   2*(z-kwargs[:hbottom])*tan(kwargs[:cutangle])/tand(30)
                                end)
     end
 
@@ -805,7 +805,7 @@ function Beam(nsegs::Int,startx,stopx,width;kwargs...)
     #two halves is set by `keygap`
     #length of the keystone measured at the beam midline
     lkey = kwargs[:keygap] + kwargs[:hbeam]*tan(kwargs[:cutangle])
-    #the first segment needs to be chamfered according to `chamfertop`, we will do the rest at
+    #the first segment needs to be chamfered according to `cutangle`, we will do the rest at
     #cutangle
     distperseg = (stopx - startx - lkey)/(nsegs-1)
     lseg = distperseg + kwargs[:overlap]
@@ -814,12 +814,12 @@ function Beam(nsegs::Int,startx,stopx,width;kwargs...)
         segpos = startx + distperseg*((2i-1)/2)
         seg = if i==1
             box(lseg + (kwargs[:overlap]/2),width,kwargs[:hbeam],kwargs[:dslice],
-                chamfer =[-kwargs[:chamfertop] kwargs[:cutangle]
-                          0                    0])            
+                chamfer =[-kwargs[:cutangle] kwargs[:cutangle]
+                          kwargs[:cutangle]  kwargs[:cutangle]])            
         else
             box(lseg,width,kwargs[:hbeam],kwargs[:dslice],
                 chamfer =[-kwargs[:cutangle]   kwargs[:cutangle]
-                          0                    0])            
+                          kwargs[:cutangle]kwargs[:cutangle]])            
         end
         #seg is currently centered at [0,0,0]. Move it into position (use preserveframe so we don't
         #move the stage
@@ -1235,7 +1235,7 @@ function scaffold(scaffolddir,kwargs::Dict)
                 #build a post along the x axis
                 #the width parameter to beam corresponds to the width at the midline
                 #we want the width to be wpost at the bottom
-                wbeam = kwargs[:wpost] - kwargs[:hbeam]*tan(kwargs[:chamfertop])
+                wbeam = kwargs[:wpost] - kwargs[:hbeam]*tan(kwargs[:cutangle])
                 hbeam = Beam(nsegs,zero(beamlength),beamlength,wbeam;kwargs...)
                 #rotate
                 rotbeam = rotate(hbeam,theta,preserveframe=true)
@@ -1314,8 +1314,8 @@ function scaffold(scaffolddir,kwargs::Dict)
                                             offset = z - kwargs[:hbottom]
                                             contour = map(verts) do v
                                                 scrootchvert(v,hexcenter,
-                                                             offset*tan(
-                                                                 kwargs[:chamfertop])/cosd(30))
+                                                             -offset*tan(
+                                                                 kwargs[:cutangle])/cosd(30))
                                             end |> polycontour
                                             z => Tessen.Slice([contour])
                                         end
@@ -1342,13 +1342,13 @@ function scaffold(scaffolddir,kwargs::Dict)
             #i think we will always have hammocks to write
             @info "compiling kernel $j"                
             #compile
-            cg = CompiledGeometry(joinpath("scripts","kernel_($j).gwl"),hatched;laserpower=kwargs[:laserpower],scanspeed=kwargs[:scanspeed])
+            cg = CompiledGeometry(joinpath("scripts","kernel_$(j).gwl"),hatched;laserpower=kwargs[:laserpower],scanspeed=kwargs[:scanspeed])
             cg = translate(cg,[kernelcenter...,zero(kernelcenter[1])])
             push!(kernels,cg)
             #ch = translate(ch,[kernelcenter...,zero(kernelcenter[1])])
             #cg = translate(cg,[(kernelcenter-lastcenter)...,zero(kernelcenter[1])])
             if !iszero(numham)                
-                ch = CompiledGeometry(joinpath("scripts","kernel_($j)_hammocks.gwl"),hamblock;laserpower=kwargs[:hamlaserpower],scanspeed=kwargs[:hamscanspeed])
+                ch = CompiledGeometry(joinpath("scripts","kernel_$(j)_hammocks.gwl"),hamblock;laserpower=kwargs[:hamlaserpower],scanspeed=kwargs[:hamscanspeed])
                 ch = translate(ch,[kernelcenter...,zero(kernelcenter[1])])
                 push!(kernels,ch)
             end
