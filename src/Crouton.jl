@@ -819,7 +819,7 @@ function Beam(nsegs::Int,startx,stopx,width;kwargs...)
         else
             box(lseg,width,kwargs[:hbeam],kwargs[:dslice],
                 chamfer =[-kwargs[:cutangle]   kwargs[:cutangle]
-                          kwargs[:cutangle]kwargs[:cutangle]])            
+                          kwargs[:cutangle]    kwargs[:cutangle]])            
         end
         #seg is currently centered at [0,0,0]. Move it into position (use preserveframe so we don't
         #move the stage
@@ -839,7 +839,7 @@ function Beam(nsegs::Int,startx,stopx,width;kwargs...)
     #the keystone is cut differently
     keystone = box(lkey,width,kwargs[:hbeam],kwargs[:dslice],
                    chamfer =[-kwargs[:cutangle]   -kwargs[:cutangle]
-                             0                    0])
+                             kwargs[:cutangle]    kwargs[:cutangle]])
     #move it into position
     keystone = translate(keystone,
                          vcat(cbeam,kwargs[:hbottom]+kwargs[:hbeam]/2),
