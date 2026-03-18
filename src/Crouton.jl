@@ -51,6 +51,7 @@ will be written to `"config.jl"`.
 - hamoverlap: amount to overlap hammocks with beams
 - diston: solid distance for vented sections
 - distoff: empty distance for vented sections
+- retryoffset: amount to increment `bottomdir` in the event of a hatching error
 """
 function createconfig(filename="config.jl")
     config = """Dict(
@@ -65,7 +66,7 @@ function createconfig(filename="config.jl")
         :dhammockslice => 1u"µm",
         :wbumper => 200u"µm",
         :fillet => 4u"µm",
-        :wpost => 50u"µm",
+        :wpost => 25u"µm",
         :hbeam => 20u"µm",
         :lbeammax => 150u"µm",
         :maxseglength => 25u"µm",
@@ -89,7 +90,8 @@ function createconfig(filename="config.jl")
         :hatchdir => 0,
         :hamoverlap => 1u"µm",
         :diston => 6u"µm",
-        :distoff => 6u"µm"
+        :distoff => 6u"µm",
+        :retryoffset => 0.5,
     )
     """
     open(filename,"w") do io
@@ -1076,7 +1078,7 @@ function scaffold(scaffolddir,kwargs::Dict)
                          kwargs[:cutangle])
         @info "hatching bumper"
         bh = hatch(b,dhatch=kwargs[:dhatch],bottomdir=kwargs[:hatchdir],diroffset=pi/2,
-                   retryoffset=0.1)
+                   retryoffset=kwargs[:retryoffset])
         @info "compiling bumper"
         compbumper = CompiledGeometry(joinpath("scripts","bumper.gwl"),bh;
                                       laserpower=kwargs[:laserpower],scanspeed=kwargs[:scanspeed])
