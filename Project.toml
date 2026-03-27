@@ -1,6 +1,6 @@
 name = "Crouton"
 uuid = "fe41dfa8-a189-4bf5-a005-5397646c563c"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Nick Stone <nicholasestone@proton.me>"]
 
 [deps]

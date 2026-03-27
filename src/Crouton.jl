@@ -1321,11 +1321,11 @@ function scaffold(scaffolddir,kwargs::Dict)
                                             end |> polycontour
                                             z => Tessen.Slice([contour])
                                         end
-                thisblock = translate(Block(slicepairs...),-1*kernelcenter)
+                thisblock = translate(Block(slicepairs...),-1*kernelcenter,preserveframe=true)
                 #hatch this block here so we can make our holes line up
                 hatch(thisblock,dhatch=kwargs[:dhammockhatch],
                       bottomdir=0,
-                      startpoint=hexcenter,diston=kwargs[:diston],
+                      startpoint=hexcenter-kernelcenter,diston=kwargs[:diston],
                       distoff=kwargs[:distoff],diroffset=pi/3)
             end
             #merge all the hammocks in this FOV
